@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Desbravador Nota 10</title>
+  <style>
+    body { font-family: Arial; background-color: black; color: yellow; padding: 20px; }
+    .quiz-box { background: #222; padding: 20px; border-radius: 10px; }
+    button { margin-top: 10px; padding: 8px 12px; }
+  </style>
+</head>
+<body>
+
+  <h1>🟡 Desbravador Nota 10</h1>
+  <h3>Desbravadores Luzeiros do Monte</h3>
+
+  <div class="quiz-box">
+    <label>Nickname: <input type="text" id="nickname"></label><br><br>
+    <div id="quiz-container"></div>
+    <button onclick="finalizarQuiz()">Finalizar</button>
+  </div>
+
+  <div id="resultado"></div>
+
+  <script>
+    const perguntas = [
+      { pergunta: "Quem construiu a arca?", opcoes: ["Moisés", "Abraão", "Noé", "Davi"], resposta: "Noé" },
+      { pergunta: "Quantos livros há na Bíblia?", opcoes: ["66", "73", "70", "80"], resposta: "66" },
+      // adicione mais...
+    ];
+
+    const quizContainer = document.getElementById("quiz-container");
+    perguntas.forEach((q, i) => {
+      const div = document.createElement("div");
+      div.innerHTML = `<p><b>${i+1}) ${q.pergunta}</b></p>` +
+        q.opcoes.map(op => `
+          <label>
+            <input type="radio" name="q${i}" value="${op}">
+            ${op}
+          </label><br>`).join("");
+      quizContainer.appendChild(div);
+    });
+
+    function finalizarQuiz() {
+      let acertos = 0;
+      perguntas.forEach((q, i) => {
+        const selecionado = document.querySelector(`input[name=q${i}]:checked`);
+        if (selecionado && selecionado.value === q.resposta) acertos++;
+      });
+
+      const nickname = document.getElementById("nickname").value;
+      const porcentagem = (acertos / perguntas.length * 100).toFixed(1);
+
+      document.getElementById("resultado").innerHTML = `
+        <h2>🏁 Fim do Quiz!</h2>
+        <p>Jogador: <b>${nickname}</b></p>
+        <p>Acertos: ${acertos} de ${perguntas.length}</p>
+        <p>Taxa de acertos: ${porcentagem}%</p>
+      `;
+
+      // Enviar para o Google Sheets
+      fetch("COLE_AQUI_SEU_WEBAPP_URL", {
+        method: "POST",
+        body: JSON.stringify({ nickname, acertos, porcentagem }),
+        headers: { "Content-Type": "application/json" }
+      }).then(r => r.text()).then(r => console.log(r));
+    }
+  </script>
+
+</body>
+</html>
